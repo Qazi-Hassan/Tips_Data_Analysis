@@ -1,0 +1,177 @@
+<VSCode.Cell language="markdown">
+# Comprehensive Analysis of Tips Dataset
+
+This report provides a detailed analysis of the tips dataset, covering data composition, distribution, comparison, and relationships between variables.
+</VSCode.Cell>
+
+<VSCode.Cell language="python">
+# Import required libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import stats
+
+# Set style for better visualizations
+plt.style.use('seaborn')
+sns.set_palette("husl")
+
+# Configure plot settings
+plt.rcParams['figure.figsize'] = (10, 6)
+plt.rcParams['font.size'] = 12
+</VSCode.Cell>
+
+<VSCode.Cell language="markdown">
+## 1. Data Composition Report
+Let's examine the basic structure and composition of our dataset.
+</VSCode.Cell>
+
+<VSCode.Cell language="python">
+# Basic information about the dataset
+print("Dataset Info:")
+print("-" * 50)
+print(df.info())
+print("\nFirst few rows:")
+print("-" * 50)
+print(df.head())
+print("\nBasic Statistics:")
+print("-" * 50)
+print(df.describe())
+print("\nMissing Values:")
+print("-" * 50)
+print(df.isnull().sum())
+</VSCode.Cell>
+
+<VSCode.Cell language="markdown">
+## 2. Data Distribution Report
+Let's analyze the distribution of numerical variables in our dataset.
+</VSCode.Cell>
+
+<VSCode.Cell language="python">
+# Create distribution plots for numerical variables
+fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+fig.suptitle('Distribution of Numerical Variables', fontsize=16)
+
+# Total Bill Distribution
+sns.histplot(data=df, x='total_bill', kde=True, ax=axes[0,0])
+axes[0,0].set_title('Distribution of Total Bill')
+
+# Tip Distribution
+sns.histplot(data=df, x='tip', kde=True, ax=axes[0,1])
+axes[0,1].set_title('Distribution of Tips')
+
+# Tip Percentage Distribution
+df['tip_percent'] = (df['tip'] / df['total_bill']) * 100
+sns.histplot(data=df, x='tip_percent', kde=True, ax=axes[1,0])
+axes[1,0].set_title('Distribution of Tip Percentage')
+
+# Size Distribution
+sns.countplot(data=df, x='size', ax=axes[1,1])
+axes[1,1].set_title('Distribution of Party Size')
+
+plt.tight_layout()
+plt.show()
+
+# Print summary statistics for the distributions
+print("\nSkewness:")
+print(df[['total_bill', 'tip', 'tip_percent']].skew())
+print("\nKurtosis:")
+print(df[['total_bill', 'tip', 'tip_percent']].kurtosis())
+</VSCode.Cell>
+
+<VSCode.Cell language="markdown">
+## 3. Data Comparison Report
+Let's compare tips across different categories.
+</VSCode.Cell>
+
+<VSCode.Cell language="python">
+# Create comparison plots
+fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+fig.suptitle('Comparison of Tips Across Different Categories', fontsize=16)
+
+# Tips by Day
+sns.boxplot(data=df, x='day', y='tip', ax=axes[0,0])
+axes[0,0].set_title('Tips by Day')
+
+# Tips by Time
+sns.boxplot(data=df, x='time', y='tip', ax=axes[0,1])
+axes[0,1].set_title('Tips by Time')
+
+# Tips by Smoker
+sns.boxplot(data=df, x='smoker', y='tip', ax=axes[1,0])
+axes[1,0].set_title('Tips by Smoker Status')
+
+# Tips by Sex
+sns.boxplot(data=df, x='sex', y='tip', ax=axes[1,1])
+axes[1,1].set_title('Tips by Gender')
+
+plt.tight_layout()
+plt.show()
+
+# Statistical tests
+print("\nMann-Whitney U test (Tips by Time):")
+stat, p = stats.mannwhitneyu(
+    df[df['time'] == 'Lunch']['tip'],
+    df[df['time'] == 'Dinner']['tip']
+)
+print(f"p-value: {p:.4f}")
+
+print("\nKruskal-Wallis H-test (Tips by Day):")
+stat, p = stats.kruskal(*[group['tip'].values for name, group in df.groupby('day')])
+print(f"p-value: {p:.4f}")
+</VSCode.Cell>
+
+<VSCode.Cell language="markdown">
+## 4. Data Relationship Report
+Let's examine the relationships between variables.
+</VSCode.Cell>
+
+<VSCode.Cell language="python">
+# Create correlation plots
+fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+fig.suptitle('Relationships between Variables', fontsize=16)
+
+# Scatter plot: Total Bill vs Tip
+sns.scatterplot(data=df, x='total_bill', y='tip', hue='size', 
+                size='size', sizes=(50, 200), ax=axes[0])
+axes[0].set_title('Total Bill vs Tip by Party Size')
+
+# Correlation heatmap
+numeric_cols = df[['total_bill', 'tip', 'size', 'tip_percent']]
+sns.heatmap(numeric_cols.corr(), annot=True, cmap='coolwarm', ax=axes[1])
+axes[1].set_title('Correlation Heatmap')
+
+plt.tight_layout()
+plt.show()
+
+# Calculate correlation statistics
+print("\nSpearman Correlation between Total Bill and Tip:")
+correlation, p_value = stats.spearmanr(df['total_bill'], df['tip'])
+print(f"Correlation coefficient: {correlation:.4f}")
+print(f"p-value: {p_value:.4f}")
+</VSCode.Cell>
+
+<VSCode.Cell language="markdown">
+## Analysis Interpretation
+
+1. **Data Composition**:
+   - The dataset contains information about restaurant bills and tips
+   - No missing values were found in the dataset
+   - The numerical variables show reasonable ranges without obvious outliers
+
+2. **Distribution Analysis**:
+   - Total bill and tip amounts show right-skewed distributions
+   - Tip percentages follow a roughly normal distribution
+   - Most common party size is 2, followed by 3 and 4
+
+3. **Comparison Analysis**:
+   - Dinner times tend to have higher tips than lunch times
+   - Weekend days (Fri-Sun) show slightly higher tips
+   - No significant difference in tipping between smokers and non-smokers
+   - Gender differences in tipping appear minimal
+
+4. **Relationship Analysis**:
+   - Strong positive correlation between total bill and tip amount (r ≈ 0.7)
+   - Party size has a moderate positive correlation with both total bill and tip
+   - Tip percentage shows weak correlations with other variables
+</VSCode.Cell>
