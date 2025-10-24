@@ -44,7 +44,7 @@ touch data_analysis_report.ipynb
 
 Here id the first prompt no.1:
 
-> `ave df in this notebook, which is tips data. act as a data analyst, and write the code using python libraries pandas, numpy, matplotlib, seaborn and plot , to do the basic data analytics tasks such as:
+> `I have df in this notebook, which is tips data. act as a data analyst, and write the code using python libraries pandas, numpy, matplotlib, seaborn and plot , to do the basic data analytics tasks such as:
 
 1. data composition report
 2. data distribution report
